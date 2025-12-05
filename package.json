@@ -1,6 +1,6 @@
 {
   "name": "react-native-tour-pilot",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A flexible, customizable tour/walkthrough library for React Native with multi-tour support, mask shapes, and Portal-based rendering",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
