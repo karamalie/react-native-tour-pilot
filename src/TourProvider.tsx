@@ -27,7 +27,6 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import type { ViewStyle } from 'react-native';
@@ -39,7 +38,6 @@ import type {
   MaskShape,
   Step,
   StepNumberProps,
-  TooltipProps,
   TourContextValue,
   TourEventCallback,
   TourEventType,
@@ -47,6 +45,7 @@ import type {
   TourProviderOptions,
   ValueXY,
 } from './types';
+import DefaultTooltip from './ToolTip';
 
 // Optional Portal import - gracefully handle if not available
 let Portal: React.ComponentType<{
@@ -141,68 +140,6 @@ function useStateWithAwait<T>(
 
   return [state, setStateWithAwait];
 }
-
-// Default Tooltip Component
-const DefaultTooltip: React.FC<TooltipProps> = ({
-  currentStep,
-  isFirstStep,
-  isLastStep,
-  labels,
-  goToNext,
-  goToPrev,
-  stop,
-}) => (
-  <View style={defaultStyles.defaultTooltipContainer}>
-    <View style={defaultStyles.tooltipContent}>
-      <Text style={defaultStyles.tooltipText}>{currentStep?.text}</Text>
-    </View>
-    <View style={defaultStyles.bottomBar}>
-      {!isLastStep && (
-        <TouchableOpacity
-          onPress={() => {
-            stop();
-          }}
-          style={defaultStyles.button}
-        >
-          <Text style={defaultStyles.buttonText}>{labels.skip || 'Skip'}</Text>
-        </TouchableOpacity>
-      )}
-      {!isFirstStep && (
-        <TouchableOpacity
-          onPress={() => {
-            goToPrev();
-          }}
-          style={defaultStyles.button}
-        >
-          <Text style={defaultStyles.buttonText}>
-            {labels.previous || 'Previous'}
-          </Text>
-        </TouchableOpacity>
-      )}
-      {!isLastStep ? (
-        <TouchableOpacity
-          onPress={() => {
-            goToNext();
-          }}
-          style={defaultStyles.button}
-        >
-          <Text style={defaultStyles.buttonText}>{labels.next || 'Next'}</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          onPress={() => {
-            stop();
-          }}
-          style={defaultStyles.button}
-        >
-          <Text style={defaultStyles.buttonText}>
-            {labels.finish || 'Finish'}
-          </Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  </View>
-);
 
 // Default Step Number Component
 const DefaultStepNumber: React.FC<StepNumberProps> = ({
@@ -1033,19 +970,6 @@ const defaultStyles = StyleSheet.create({
     overflow: 'visible',
     ...(Platform.OS === 'android' && { elevation: 50 }),
   },
-  defaultTooltipContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 15,
-    maxWidth: 300,
-  },
-  tooltipContent: {
-    flex: 1,
-  },
-  tooltipText: {
-    fontSize: 14,
-    color: '#333',
-  },
   stepNumberContainer: {
     position: 'absolute',
     width: STEP_NUMBER_DIAMETER,
@@ -1066,17 +990,5 @@ const defaultStyles = StyleSheet.create({
     fontSize: 10,
     color: '#FFFFFF',
     fontWeight: 'bold',
-  },
-  button: {
-    padding: 10,
-  },
-  buttonText: {
-    color: '#27ae60',
-    fontWeight: '500',
-  },
-  bottomBar: {
-    marginTop: 10,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
   },
 });
