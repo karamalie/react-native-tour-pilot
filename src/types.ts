@@ -64,6 +64,8 @@ export interface Step {
   maskShape?: MaskShape;
   /** Custom border radius for this step (overrides provider default) */
   borderRadius?: number;
+  /** Padding around highlighted elements */
+  highlightPadding?: number;
 }
 
 /**
@@ -260,6 +262,8 @@ export interface TourStepProps {
   maskShape?: MaskShape;
   /** Custom border radius (overrides provider default) */
   borderRadius?: number;
+  /** Padding around highlighted elements */
+  highlightPadding?: number;
 }
 
 /**

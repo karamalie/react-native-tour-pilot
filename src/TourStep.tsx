@@ -34,6 +34,7 @@ export const TourStep: React.FC<TourStepProps> = ({
   children,
   maskShape = 'rounded-rectangle',
   borderRadius,
+  highlightPadding,
 }) => {
   const registeredName = useRef<string | null>(null);
   const { registerStep, unregisterStep } = useTour();
@@ -74,6 +75,7 @@ export const TourStep: React.FC<TourStepProps> = ({
         measure,
         maskShape,
         borderRadius,
+        highlightPadding,
       });
 
       registeredName.current = name;
@@ -88,6 +90,7 @@ export const TourStep: React.FC<TourStepProps> = ({
     unregisterStep,
     maskShape,
     borderRadius,
+    highlightPadding,
   ]);
 
   useEffect(() => {

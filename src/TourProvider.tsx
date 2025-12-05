@@ -65,7 +65,7 @@ const STEP_NUMBER_RADIUS = 14;
 const STEP_NUMBER_DIAMETER = STEP_NUMBER_RADIUS * 2;
 const ZINDEX = 100;
 const DEFAULT_MARGIN = 13;
-const OFFSET_WIDTH = 4;
+const DEFAULT_HIGHLIGHT_PADDING = 4;
 const DEFAULT_ARROW_SIZE = 6;
 const MAX_START_TRIES = 120;
 
@@ -687,6 +687,7 @@ export const TourProvider: React.FC<
   children,
   verticalOffset = 0,
   portalHostName = 'tour-pilot-portal',
+  highlightPadding = DEFAULT_HIGHLIGHT_PADDING,
   ...options
 }) => {
   const startTries = useRef(0);
@@ -734,18 +735,22 @@ export const TourProvider: React.FC<
       if (!step) return;
       const measurement = await step.measure();
       if (!measurement) return;
+
+      // Use step's highlightPadding if defined, otherwise use provider's default
+      const padding = step.highlightPadding ?? highlightPadding;
+
       await modalRef.current?.animateMove(
         {
-          width: measurement.width + OFFSET_WIDTH,
-          height: measurement.height + OFFSET_WIDTH,
-          x: measurement.x - OFFSET_WIDTH / 2,
-          y: measurement.y - OFFSET_WIDTH / 2 + verticalOffset,
+          width: measurement.width + padding,
+          height: measurement.height + padding,
+          x: measurement.x - padding / 2,
+          y: measurement.y - padding / 2 + verticalOffset,
         },
         step.maskShape,
         step.borderRadius
       );
     },
-    [verticalOffset]
+    [verticalOffset, highlightPadding]
   );
 
   const setCurrentStep = useCallback(
