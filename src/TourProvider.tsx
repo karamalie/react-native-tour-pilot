@@ -20,7 +20,7 @@ import {
   BackHandler,
   Dimensions,
   Easing,
-  findNodeHandle,
+  InteractionManager,
   NativeModules,
   Platform,
   ScrollView,
@@ -758,26 +758,26 @@ export const TourProvider: React.FC<
       setCurrentStepState(step);
 
       if (scrollViewRef.current && step?.wrapperRef.current) {
-        const nodeHandle = findNodeHandle(scrollViewRef.current);
-        if (nodeHandle) {
-          step.wrapperRef.current.measureLayout(
-            nodeHandle as unknown as number,
-            (_x, y, _w, h) => {
-              const yOffset = y > 0 ? y - h / 2 : 0;
-              scrollViewRef.current?.scrollTo({ y: yOffset, animated: false });
-            },
-            // Error callback required by measureLayout API
-            () => {}
-          );
-        }
+        step.wrapperRef.current.measureLayout(
+          scrollViewRef.current as unknown as number,
+          (_x, y, _w, h) => {
+            const yOffset = y > 0 ? y - h / 2 : 0;
+            scrollViewRef.current?.scrollTo({ y: yOffset, animated: false });
+          },
+          // Error callback required by measureLayout API
+          () => {}
+        );
       }
 
-      setTimeout(
-        async () => {
-          if (move && step) await moveModalToStep(step);
-        },
-        scrollViewRef.current ? 100 : 0
-      );
+      if (move && step) {
+        if (scrollViewRef.current) {
+          InteractionManager.runAfterInteractions(async () => {
+            await moveModalToStep(step);
+          });
+        } else {
+          await moveModalToStep(step);
+        }
+      }
     },
     [moveModalToStep]
   );
@@ -880,6 +880,14 @@ export const TourProvider: React.FC<
     [orderedSteps, setCurrentStep, events, activeTour]
   );
 
+  const remeasureCurrentStep = useCallback(async () => {
+    if (currentStep) {
+      // Small delay to let the new layout settle before measuring
+      await new Promise(resolve => setTimeout(resolve, 50));
+      await moveModalToStep(currentStep);
+    }
+  }, [currentStep, moveModalToStep]);
+
   const on = useCallback(
     <T extends TourEventType>(event: T, callback: TourEventCallback<T>) =>
       events.on(event, callback),
@@ -910,6 +918,7 @@ export const TourProvider: React.FC<
       totalStepsNumber,
       on,
       off,
+      remeasureCurrentStep,
     }),
     [
       registerStep,
@@ -928,6 +937,7 @@ export const TourProvider: React.FC<
       totalStepsNumber,
       on,
       off,
+      remeasureCurrentStep,
     ]
   );
 

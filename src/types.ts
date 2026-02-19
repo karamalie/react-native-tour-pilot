@@ -240,6 +240,8 @@ export interface TourContextValue {
     event: T,
     callback: TourEventCallback<T>
   ) => void;
+  /** Re-measures and repositions the overlay for the current active step */
+  remeasureCurrentStep: () => Promise<void>;
 }
 
 /**
