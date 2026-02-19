@@ -37,7 +37,13 @@ export const TourStep: React.FC<TourStepProps> = ({
   highlightPadding,
 }) => {
   const registeredName = useRef<string | null>(null);
-  const { registerStep, unregisterStep, currentStep, activeTour, remeasureCurrentStep } = useTour();
+  const {
+    registerStep,
+    unregisterStep,
+    currentStep,
+    activeTour,
+    remeasureCurrentStep,
+  } = useTour();
   const wrapperRef = useRef<NativeMethods>(null);
 
   const measure = async (): Promise<LayoutRect | null> => {
@@ -117,7 +123,7 @@ export const TourStep: React.FC<TourStepProps> = ({
       onLayout: () => {
         // Re-position overlay if this step is currently active
         if (currentStep?.name === name && activeTour === tourKey) {
-          void remeasureCurrentStep();
+          remeasureCurrentStep().catch(() => {});
         }
       },
       collapsable: false,
