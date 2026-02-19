@@ -20,7 +20,6 @@ import {
   BackHandler,
   Dimensions,
   Easing,
-  InteractionManager,
   NativeModules,
   Platform,
   ScrollView,
@@ -758,25 +757,24 @@ export const TourProvider: React.FC<
       setCurrentStepState(step);
 
       if (scrollViewRef.current && step?.wrapperRef.current) {
-        step.wrapperRef.current.measureLayout(
-          scrollViewRef.current as unknown as number,
-          (_x, y, _w, h) => {
-            const yOffset = y > 0 ? y - h / 2 : 0;
-            scrollViewRef.current?.scrollTo({ y: yOffset, animated: false });
-          },
-          // Error callback required by measureLayout API
-          () => {}
-        );
+        // Scroll to the step and wait for the native layer to commit before measuring
+        await new Promise<void>((resolve) => {
+          step.wrapperRef.current!.measureLayout(
+            scrollViewRef.current as unknown as number,
+            (_x, y, _w, h) => {
+              const yOffset = y > 0 ? y - h / 2 : 0;
+              scrollViewRef.current?.scrollTo({ y: yOffset, animated: false });
+              // Double rAF: first frame queues the native scroll, second frame confirms it
+              requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+            },
+            () => resolve() // error callback: resolve anyway
+          );
+        });
       }
 
+      // Always measure AFTER scroll has fully settled
       if (move && step) {
-        if (scrollViewRef.current) {
-          InteractionManager.runAfterInteractions(async () => {
-            await moveModalToStep(step);
-          });
-        } else {
-          await moveModalToStep(step);
-        }
+        await moveModalToStep(step);
       }
     },
     [moveModalToStep]
