@@ -765,7 +765,9 @@ export const TourProvider: React.FC<
               const yOffset = y > 0 ? y - h / 2 : 0;
               scrollViewRef.current?.scrollTo({ y: yOffset, animated: false });
               // Double rAF: first frame queues the native scroll, second frame confirms it
-              requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => resolve())
+              );
             },
             () => resolve() // error callback: resolve anyway
           );
@@ -881,7 +883,7 @@ export const TourProvider: React.FC<
   const remeasureCurrentStep = useCallback(async () => {
     if (currentStep) {
       // Small delay to let the new layout settle before measuring
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
       await moveModalToStep(currentStep);
     }
   }, [currentStep, moveModalToStep]);
